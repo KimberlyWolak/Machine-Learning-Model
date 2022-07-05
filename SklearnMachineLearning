@@ -1,0 +1,72 @@
+from sklearn.datasets import load_iris
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import confusion_matrix
+
+#Question Answers
+#Best Max Depth: The best depth would be 5 since there is no noticible increase from depth 5 to depth 10
+#Most False Positives: All of the models from step 3 show zero false positives.
+#I wonder if the dataset is too small to be able to determine this accuratly?
+
+data = load_iris()
+			
+features = data["data"]
+labels = data["target"]
+
+#Splitting the test data
+#features_train & labels_train --> Training Data: 80%
+#features_test & labels_test --> Testing Data 20%
+features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size = 0.2)
+
+#models - original|D-1|D-5|D-10
+model = DecisionTreeClassifier()
+model_depth_one = DecisionTreeClassifier(max_depth=1)
+model_depth_five = DecisionTreeClassifier(max_depth=5)
+model_depth_ten = DecisionTreeClassifier(max_depth=10)
+
+#train the model
+model.fit(features_train, labels_train)
+model_depth_one.fit(features_train, labels_train)
+model_depth_five.fit(features_train, labels_train)
+model_depth_ten.fit(features_train, labels_train)
+
+#test the model
+predict_original_model = model.predict(features_test)
+predict_model_depth_one = model_depth_one.predict(features_test)
+predict_model_depth_five = model_depth_five.predict(features_test)
+predict_model_depth_ten = model_depth_ten.predict(features_test)
+
+#accuracy
+accuracy_of_original_model = accuracy_score(predict_original_model,labels_test)
+accuracy_of_model_depth_one = accuracy_score(predict_model_depth_one,labels_test)
+accuracy_of_model_depth_five = accuracy_score(predict_model_depth_five,labels_test)
+accuracy_of_model_depth_ten = accuracy_score(predict_model_depth_ten,labels_test)
+
+#confusion matrix 
+cf_model_depth_one = confusion_matrix(labels_test,predict_model_depth_one)
+cf_model_depth_five = confusion_matrix(labels_test,predict_model_depth_five)
+cf_model_depth_ten = confusion_matrix(labels_test,predict_model_depth_ten)
+
+#false Positives (cell 4 + cell 7)
+fp_model_depth_one = cf_model_depth_one[1][0] + cf_model_depth_one[2][0]
+fp_model_depth_five = cf_model_depth_five[1][0] + cf_model_depth_five[2][0]
+fp_model_depth_ten = cf_model_depth_one[1][0] + cf_model_depth_ten[2][0]
+
+#Accuracy of original model (amount correct/total)
+print(f"Accuracy of Original Model: {accuracy_of_original_model}")
+
+#Accuracy of depth N model (amount correct/total)
+print(f"Accuracy of Depth 1: {accuracy_of_model_depth_one}")
+print(f"Accuracy of Depth 5: {accuracy_of_model_depth_five}") # Best
+print(f"Accuracy of Depth 10: {accuracy_of_model_depth_ten}") # no change
+
+#False positives of N depth
+print(cf_model_depth_one)
+print(f"False Positives of model depth 1: {fp_model_depth_one}")
+
+print(cf_model_depth_five)
+print(f"False Positives of model depth 5: {fp_model_depth_five}")
+
+print(cf_model_depth_ten)
+print(f"False Positives of model depth 10: {fp_model_depth_ten}")
